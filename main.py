@@ -1,68 +1,78 @@
 import pygame
-
 pygame.init()
 
-scr_width = 500
-scr_height = 500
-screen = pygame.display.set_mode((scr_width, scr_height))
-pygame.display.set_caption("Ping Pong")
-# создаём таймер
+win_w = 700
+win_h = 500
+
+FPS = 40
+
+window = pygame.display.set_mode((win_w, win_h))
+
 clock = pygame.time.Clock()
 
-FPS = 50
-
-screen.fill((20, 180, 255))
-
-
+background = pygame.image.load("flat.jpg")
+background = pygame.transform.scale(background, (win_w, win_h))
 
 class GameSprite:
     def __init__(self, x, y, w, h, image):
         self.rect = pygame.Rect(x, y, w, h)
-        self.image = pygame.transform.scale(image, 
-                                (self.rect.width, self.rect.height))     
+        image = pygame.transform.scale(image, (w, h))
+        self.image = image
     
-    def draw(self):
-        screen.blit(self.image, (self.rect.x, self.rect.y))
+    def update(self):
+        window.blit(self.image, (self.rect.x, self.rect.y))
 
-class Ball(GameSprite):
-    def __init__(self, x, y, w, h, image, speed_x, speed_y):
-        super().__init__(x, y, w, h, image)
-        self.speed_x = speed_x
-        self.speed_y = speed_y
-    
-    def move(self):
-        #мяч движется в зависимости от скорости
-        self.rect.x += self.speed_x
-        self.rect.y += self.speed_y
-        # если касается верхней границы, скорость по вертикали меняет знак
-        if self.rect.y >= scr_height - self.rect.height:
-            self.speed_y *= (-1)
-        # если касается нижней границы, скорость по вертикали меняет знак
-        if self.rect.y <= 0:
-            self.speed_y *= (-1)
 
-class Player(GameSprite):
-    def __init__(self, x, y, w, h, image, speed, key_up, key_down):
+class Pers(GameSprite):
+    def __init__(self, x, y, w, h, image, speed):
         super().__init__(x, y, w, h, image)
         self.speed = speed
-        self.key_down = key_down
-        self.key_up = key_up
-    
-    def move(self):
-        if pygame.key.get_pressed()[self.key_up]:
-           self.rect.y -= self.speed
-        if pygame.key.get_pressed()[self.key_down]:
-           self.rect.y += self.speed
+        self.clip = 5
 
+    def move(self, key_up, key_down):
+        k = pygame.key.get_pressed()
+        if k[key_down]:
+            if self.rect.right <= win_w:
+                self.rect.y += self.speed 
+        elif k[key_up]:
+            if self.rect.left >= 0:
+                self.rect.y -= self.speed
+        if self.rect.y <= 0:
+            self.rect.y += self.speed
+        elif self.rect.bottom >= 500:
+            self.rect.y -= self.speed
+        
+class Ball(GameSprite):
+    def __init__(self, x, y, w, h, image, speed):
+        super().__init__(x, y, w, h, image)
+        self.speed = speed
+    def move(self):
+        self.rect.x += self.speed
+        self.rect.y += self.speed
+        if self.rect.bottom > 500:
+            self.rect.y -= self.speed
+            
+    
+
+raketka_img = pygame.image.load("Roket.jpg")
+sharik_img = pygame.image.load("sharik.png")
+raketka1 = Pers(20, 200, 20, 60, raketka_img, 3)
+raketka2 = Pers(660, 200, 20, 60, raketka_img, 3)
+ball = Ball(350, 250, 25, 25, sharik_img, 4 )
 game = True
 while game:
-
-
-
+    # window.fill((0, 255, 0))
+    window.blit(background, (0, 0))
+    raketka1.update()
+    raketka1.move(pygame.K_w, pygame.K_s)
+    raketka2.update()
+    raketka2.move(pygame.K_UP, pygame.K_DOWN)
+    ball.update()
+    ball.move()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             game = False
-    
+
     pygame.display.update()
     clock.tick(FPS)
