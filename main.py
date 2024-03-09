@@ -41,24 +41,29 @@ class Pers(GameSprite):
             self.rect.y += self.speed
         elif self.rect.bottom >= 500:
             self.rect.y -= self.speed
-        
+
+
 class Ball(GameSprite):
     def __init__(self, x, y, w, h, image, speed):
         super().__init__(x, y, w, h, image)
-        self.speed = speed
+        self.speedx = speed
+        self.speedy = speed
     def move(self):
-        self.rect.x += self.speed
-        self.rect.y += self.speed
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
         if self.rect.bottom > 500:
-            self.rect.y -= self.speed
-            
-    
-
+            self.speedy = self.speedy*-1   
+        
+        
 raketka_img = pygame.image.load("Roket.jpg")
-sharik_img = pygame.image.load("sharik.png")
 raketka1 = Pers(20, 200, 20, 60, raketka_img, 3)
-raketka2 = Pers(660, 200, 20, 60, raketka_img, 3)
-ball = Ball(350, 250, 25, 25, sharik_img, 4 )
+
+raketka2_img = pygame.image.load("Roket2.jpg")
+raketka2 = Pers(660, 200, 20, 60, raketka2_img, 3)
+
+ball_img = pygame.image.load("ball.png")
+ball = Ball(350, 250, 25, 25, ball_img, 4)
+
 game = True
 while game:
     # window.fill((0, 255, 0))
@@ -66,7 +71,7 @@ while game:
     raketka1.update()
     raketka1.move(pygame.K_w, pygame.K_s)
     raketka2.update()
-    raketka2.move(pygame.K_UP, pygame.K_DOWN)
+    raketka2.move(pygame.K_DOWN, pygame.K_UP)
     ball.update()
     ball.move()
 
